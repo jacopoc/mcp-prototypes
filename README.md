@@ -1,8 +1,8 @@
 # mcp-prototypes
 Various prototypes for MCP server implementations.
 
-*mcp_sdk_stdio*
-An MCP server that communicates via stdio to the MCP client and connects as an HTTP client to a remote Backend server (e.g. Apache OFBiz, Moqui). Implemented in Typescript with the MCP SDK.
+# mcp_sdk_stdio
+An MCP server that communicates with the MCP client via stdio and connects as an HTTP client to a remote Backend server (e.g. Apache OFBiz, Moqui). Implemented in Typescript with the MCP SDK.
 
 Prerequisites:
 Node.js, npm
