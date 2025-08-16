@@ -1,0 +1,69 @@
+# ---------------------------
+# macOS system files
+# ---------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+
+# ---------------------------
+# Node.js / npm
+# ---------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ---------------------------
+# TypeScript / build outputs
+# ---------------------------
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# ---------------------------
+# Logs
+# ---------------------------
+logs
+*.log
+*.csv
+*.dat
+*.pid
+*.seed
+*.pid.lock
+
+# ---------------------------
+# Environment / config
+# ---------------------------
+.env
+.env.test
+.env.production
+config/local.json
+
+# ---------------------------
+# IDE / Editor files
+# ---------------------------
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ---------------------------
+# Misc
+# ---------------------------
+coverage/
+.cache/
+.tmp/
+
