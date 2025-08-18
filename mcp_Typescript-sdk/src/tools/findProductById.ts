@@ -5,9 +5,12 @@ import type { ToolDefinition } from "../toolLoader.js";
 export default function(): ToolDefinition {
     return {
         name: "findProductById",
-        description: "Find a product by using its ID. If the ID is not provided, ask for it.",
-        inputSchema: {
-            id: z.string().min(2).max(20).describe("ID of the product to find; must be between 2 and 20 characters long."),
+        metadata: {
+            title: "Find a product by ID",
+            description: "Find a product by using its ID. If the ID is not provided, ask for it.",
+            inputSchema: {
+                id: z.string().min(2).max(20).describe("ID of the product to find; must be between 2 and 20 characters long."),
+            }
         },
         handler: async ({ id }: { id: string }) => {
             const idParam = { idToFind: id };

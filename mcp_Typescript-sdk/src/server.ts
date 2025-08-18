@@ -27,12 +27,19 @@ async function registerTools() {
         const tools = await loadTools();
         
         for (const tool of tools) {
+            server.registerTool(
+                tool.name,
+                tool.metadata,
+                tool.handler
+            );
+            /*
             server.tool(
                 tool.name,
                 tool.description,
                 tool.inputSchema,
                 tool.handler
             );
+            */
             console.error(`Registered tool: ${tool.name}`);
         }
     } catch (error) {

@@ -75,8 +75,7 @@ app.post('/mcp', async (req, res) => {
             for (const tool of tools) {
                 server.tool(
                     tool.name,
-                    tool.description,
-                    tool.inputSchema,
+                    tool.metadata,
                     tool.handler
                 );
                 console.error(`Registered tool: ${tool.name}`);

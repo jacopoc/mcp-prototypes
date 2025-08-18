@@ -3,8 +3,11 @@ import * as path from "path";
 
 export interface ToolDefinition {
     name: string;
-    description: string;
-    inputSchema: Record<string, any>;
+    metadata: {
+        title: string,
+        description: string,
+        inputSchema: Record<string, any>
+    };
     handler: (params: any) => Promise<any>;
 }
 
