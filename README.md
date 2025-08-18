@@ -20,3 +20,11 @@ Steps to build:
     }
   }
 }
+
+# mcp_sdk_streamable
+1) npm install
+2) npm run build
+3) node build/server-remote.js
+
+# how to test
+npx @modelcontextprotocol/inspector
