@@ -1,8 +1,12 @@
 # mcp-prototypes
 Various prototypes for MCP server implementations.
 
-# mcp_sdk_stdio
-An MCP server that communicates with the MCP client via stdio and connects as an HTTP client to a remote backend server (e.g. Apache OFBiz, Moqui). Implemented in Typescript with the MCP SDK.
+## mcp_Typescript-sdk
+
+Contains MCP servers built using the Anthropic's Typescript SDK. These servers act as protocol bridges, acting as an MCP server to communicate via MCP with clients hosted in AI powered applications and as an HTTP client to communicate with a remote backend RESTful APIs (e.g. Apache OFBiz, Moqui).
+
+### local MCP server (STDIO)
+An MCP server that communicates with the MCP client via stdio and connects as an HTTP client to a remote backend server.
 
 Prerequisites:
 Node.js, npm
@@ -21,7 +25,8 @@ Steps to build:
   }
 }
 
-# mcp_sdk_streamable
+### remote MCP server (Streamable HTTP)
+This server uses the Streamable HTTP transport.
 1) npm install
 2) npm run build
 3) node build/server-remote.js
