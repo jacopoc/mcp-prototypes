@@ -18,17 +18,22 @@ Steps to build:
 An MCP server that communicates with the MCP client via stdio and connects as an HTTP client to a remote backend server.
 
 
-Claude Desktop configuration file:
+Edit or create the Claude Desktop configuration file:
 
+```sh
 vi ~/Library/Application\ Support/Claude/claude_desktop_config.json
+```
+in order to add the definition of the MCP local server (e.g. "Apache OFBiz")
+```json
 {
   "mcpServers": {
     "Apache OFBiz": {
       "command": "node",
-      "args": ["/Users/jacopoc/projects/ofbiz/mcp-prototypes/mcp_sdk_stdio/build/server.js"]
+      "args": ["PATH_TO/mcp-prototypes/mcp_sdk_stdio/build/server.js"]
     }
   }
 }
+```
 
 ### remote MCP server (Streamable HTTP)
 
