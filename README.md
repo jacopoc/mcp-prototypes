@@ -10,9 +10,10 @@ Prerequisites:
 * npm
 
 Steps to build:
-
-1) npm install
-2) npm run build
+```sh
+npm install
+npm run build
+```
 
 ### local MCP server (STDIO)
 An MCP server that communicates with the MCP client via stdio and connects as an HTTP client to a remote backend server.
@@ -23,7 +24,7 @@ Edit or create the Claude Desktop configuration file:
 ```sh
 vi ~/Library/Application\ Support/Claude/claude_desktop_config.json
 ```
-in order to add the definition of the MCP local server (e.g. "Apache OFBiz")
+and add to it the definition of the MCP local server (e.g. "Apache OFBiz")
 ```json
 {
   "mcpServers": {
@@ -40,11 +41,17 @@ in order to add the definition of the MCP local server (e.g. "Apache OFBiz")
 This server uses the Streamable HTTP transport.
 
 Run the server:
+```sh
+node build/server-remote.js
+```
 
- node build/server-remote.js
 
 # Tool to test
+You can use Anthropic's Inspector to test the interaction with the MCP servers.
+This tool is especially useful to test the remote server from a browser without an AI client.
 
+You can run (and install) the Inspector with the following command:
+```sh
 npx @modelcontextprotocol/inspector
-
-This tool is especially used to test the server from a browser without an AI client.
+```
+This command will open up a browser window ready to work with the Inspector.
