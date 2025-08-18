@@ -73,7 +73,7 @@ app.post('/mcp', async (req, res) => {
             const tools = await loadTools();
             
             for (const tool of tools) {
-                server.tool(
+                server.registerTool(
                     tool.name,
                     tool.metadata,
                     tool.handler
