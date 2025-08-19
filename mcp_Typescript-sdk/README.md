@@ -97,9 +97,9 @@ Add your local MCP server configuration:
 ```
 After updating the configuration file, launch Claude Desktop and try the following sample prompts:
 * *"Can you provide some information about the product WG-1111?"*
-* *"Can you provide some information about an OFBiz product?"*  
+* *"Can you provide some information about a product?"*  
 (Claude will ask for a product ID before invoking the tool.)
-* *"Can you compare two OFBiz products?"*  
+* *"Can you compare two products?"*  
 (Claude will ask for two product IDs, invoke the tool twice, and then compare the results.)
 
 ## 🌐 Test the Remote MCP Server
