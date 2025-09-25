@@ -21,7 +21,8 @@ The project is implemented in **TypeScript**, uses the **Anthropic TypeScript SD
 3. [Project Structure](#project-structure)  
 4. [Build the Project](#build-the-project)  
 5. [Test the Local MCP Server](#test-the-local-mcp-server)  
-6. [Test the Remote MCP Server](#test-the-remote-mcp-server)  
+6. [Test the Remote MCP Server](#test-the-remote-mcp-server)
+7. [Inspect the MCP servers](#inspect-the-mcp-servers)
 
 ---
 
@@ -108,10 +109,32 @@ Start the server:
 ```sh
 node build/server-remote.js
 ```
-You can use Anthropic’s **Inspector** to easily test interactions with the remote MCP server, without requiring valid certificates or deploying the server on a publicly accessible host.
+
+You can test the local MCP server with **Claude Desktop**.  
+
+Edit or create the Claude Desktop configuration file:
+
+```sh
+~/Library/Application\ Support/Claude/claude_desktop_config.json
+```
+Add your local MCP server configuration:
+```json
+{
+  "mcpServers": {
+    "Apache OFBiz": {
+      "command": "npx",
+      "args": ["mcp-remote", "http://localhost:3000"]
+    }
+  }
+}
+```
+
+## Inspect the MCP servers
+
+You can use Anthropic’s **Inspector** to easily test interactions with the local and remote MCP servers. You can do this also when a remote server is executed in your local host or private network, without requiring valid certificates or deploying the server on a publicly accessible host.
 
 Run (and install) the Inspector with:
 ```sh
 npx @modelcontextprotocol/inspector
 ```
-This will open a browser window ready to test your MCP server.
+This will open a browser window ready to test your MCP servers.
