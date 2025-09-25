@@ -63,7 +63,7 @@ app.post('/mcp', async (req, res) => {
       }
     };
     const server = new McpServer({
-      name: "Apache OFBiz",
+      name: "Apache OFBiz MCP Server (Streamable HTTP)",
       version: "0.1.0"
     });
 

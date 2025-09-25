@@ -17,7 +17,7 @@ export const USER_AGENT = "OFBiz-MCP-server";
 
 // Create server instance
 const server = new McpServer({
-    name: "Apache OFBiz",
+    name: "Apache OFBiz MCP Server (stdio)",
     version: "0.1.0",
 });
 
@@ -32,14 +32,6 @@ async function registerTools() {
                 tool.metadata,
                 tool.handler
             );
-            /*
-            server.tool(
-                tool.name,
-                tool.description,
-                tool.inputSchema,
-                tool.handler
-            );
-            */
             console.error(`Registered tool: ${tool.name}`);
         }
     } catch (error) {
