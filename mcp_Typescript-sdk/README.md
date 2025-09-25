@@ -16,16 +16,16 @@ The project is implemented in **TypeScript**, uses the **Anthropic TypeScript SD
 ---
 
 ## 📑 Table of Contents
-1. [Features](#-features)  
-2. [Configuration](#-configuration)  
-3. [Project Structure](#-project-structure)  
-4. [Build the Project](#-build-the-project)  
-5. [Test the Local MCP Server](#-test-the-local-mcp-server)  
-6. [Test the Remote MCP Server](#-test-the-remote-mcp-server)  
+1. [Features](#features)  
+2. [Configuration](#configuration)  
+3. [Project Structure](#project-structure)  
+4. [Build the Project](#build-the-project)  
+5. [Test the Local MCP Server](#test-the-local-mcp-server)  
+6. [Test the Remote MCP Server](#test-the-remote-mcp-server)  
 
 ---
 
-## 🚀 Features
+## Features
 
 The project includes two alternative MCP servers:  
 
@@ -38,7 +38,7 @@ Each tool is defined and implemented in its own file. For example, the sample to
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 Server configuration is managed via `config/config.json`, which defines:  
 
@@ -50,7 +50,7 @@ The authorization token for the OFBiz API can be easily generated and set up by 
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 mcp_Typescript-sdk/
@@ -68,14 +68,14 @@ mcp_Typescript-sdk/
 └── README.md
 ```
 
-## 🔨 Build the Project
+## Build the Project
 
 ```sh
 npm install
 npm run build
 ```
 
-## 🖥️ Test the Local MCP Server
+## Test the Local MCP Server
 
 You can test the local MCP server with **Claude Desktop**.  
 
@@ -102,7 +102,7 @@ After updating the configuration file, launch Claude Desktop and try the followi
 * *"Can you compare two products?"*  
 (Claude will ask for two product IDs, invoke the tool twice, and then compare the results.)
 
-## 🌐 Test the Remote MCP Server
+## Test the Remote MCP Server
 
 Start the server:
 ```sh
