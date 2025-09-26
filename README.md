@@ -1,12 +1,15 @@
-# MCP Servers Implemented Using the Anthropic SDK for TypeScript
+# MCP Server for REST APIs
 
-This project provides prototype implementations of MCP servers that:  
+This project provides a prototype implementation of an MCP server that:  
 
-- expose specific tools,  
-- receive requests from an MCP client (usually hosted in a generative AI application such as Claude Desktop),  
-- forward those requests to a remote backend via RESTful API endpoints.  
+- exposes specific tools,  
+- receives requests from an MCP client (usually hosted in a generative AI application such as Claude Desktop),  
+- forwards those requests to a remote backend via RESTful API endpoints,
+- is implemented using the Anthropic SDK for TypeScript.    
 
-With this approach, the servers enable generative AI applications to interact with remote systems such as **Apache OFBiz** and **Moqui**.  
+The server enables generative AI applications to interact with remote systems that expose REST API endpoints, such as **Apache OFBiz** and **Moqui**.  
+
+The server is implemented in two versions, one that runs as a local MCP server (stdio transport) and one that runs as a remote MCP server (Streamable HTTP transport).
 
 The project is implemented in **TypeScript**, uses the **Anthropic TypeScript SDK**, and requires:  
 
@@ -15,7 +18,7 @@ The project is implemented in **TypeScript**, uses the **Anthropic TypeScript SD
 
 ---
 
-## 📑 Table of Contents
+## Table of Contents
 1. [Features](#features)  
 2. [Configuration](#configuration)  
 3. [Project Structure](#project-structure)  
@@ -54,7 +57,7 @@ The authorization token for the OFBiz API can be easily generated and set up by 
 ## Project Structure
 
 ```text
-mcp_Typescript-sdk/
+mcp-prototypes/
 ├── config/
 │   └── config.json               # Server configuration (backend API base, auth token, etc.)
 ├── src/
