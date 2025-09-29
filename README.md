@@ -94,7 +94,7 @@ Add your local MCP server configuration:
   "mcpServers": {
     "Apache OFBiz": {
       "command": "node",
-      "args": ["PATH_TO/mcp_Typescript-sdk/build/server.js"]
+      "args": ["PATH_TO/mcp-prototypes/build/server.js"]
     }
   }
 }
