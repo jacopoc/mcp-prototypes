@@ -1,5 +1,6 @@
 {
   "BACKEND_API_BASE": "https://demo-stable.ofbiz.apache.org/rest/services",
-  "BACKEND_AUTH_TOKEN": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NTU1MDY3OTIsImV4cCI6MTc1NTUwODU5MiwiaXNzIjoiQXBhY2hlT0ZCaXoiLCJ1c2VyTG9naW5JZCI6ImFkbWluIn0.ecK8WJvw2mvD6OfPnwWvS5jAWUipEo5tZFqBTO4y8-nPkjOghy0m7WSnBxZMKkNYlotVDn1P0N-et9RhB2u0KA",
+  "BACKEND_API_AUTH": "https://demo-stable.ofbiz.apache.org/rest/auth/token",
+  "BACKEND_AUTH_TOKEN": "",
   "SERVER_PORT": 3000
 }
