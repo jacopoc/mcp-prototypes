@@ -1,19 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import * as fs from "fs";
-import * as path from "path";
 import { loadTools } from "./toolLoader.js";
-
-// Load configuration
-const configPath = path.resolve(
-    path.dirname(new URL(import.meta.url).pathname),
-    "../config/config.json"
-);
-const configData = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-
-export const BACKEND_API_BASE = configData.BACKEND_API_BASE;
-export const BACKEND_AUTH_TOKEN = configData.BACKEND_AUTH_TOKEN;
-export const USER_AGENT = "OFBiz-MCP-server";
 
 // Create server instance
 const server = new McpServer({

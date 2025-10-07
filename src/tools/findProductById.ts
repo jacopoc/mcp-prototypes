@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BACKEND_API_BASE, BACKEND_AUTH_TOKEN, USER_AGENT } from "../server.js";
+import { BACKEND_API_BASE, BACKEND_AUTH_TOKEN, USER_AGENT } from "../server-remote.js";
 import type { ToolDefinition } from "../toolLoader.js";
 
 export default function(): ToolDefinition {
@@ -23,10 +23,10 @@ export default function(): ToolDefinition {
                     "User-Agent": USER_AGENT,
                     Accept: "application/json",
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${BACKEND_AUTH_TOKEN}`,
+                    Authorization: `Bearer ${BACKEND_AUTH_TOKEN()}`,
                 },
             };
-
+ 
             try {
                 const response = await fetch(backendUrl, requestOptions);
                 if (!response.ok) {
