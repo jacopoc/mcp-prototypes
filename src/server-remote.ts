@@ -12,14 +12,20 @@ const configPath = path.resolve(
     path.dirname(new URL(import.meta.url).pathname),
     "../config/config.json"
 );
+
 const configData = JSON.parse(fs.readFileSync(configPath, "utf-8"));
 
+// Always read the latest config from the file system
+function getConfigData() {
+    return JSON.parse(fs.readFileSync(configPath, "utf-8"));
+}
+
 export const BACKEND_API_BASE = configData.BACKEND_API_BASE;
-export const BACKEND_AUTH_TOKEN = configData.BACKEND_AUTH_TOKEN;
+export const BACKEND_AUTH_TOKEN = () => getConfigData().BACKEND_AUTH_TOKEN;
 export const USER_AGENT = "OFBiz-MCP-server";
 
 // Server configuration
-const SERVER_PORT = configData.SERVER_PORT || 3000;
+const SERVER_PORT = configData.SERVER_PORT;
 /*
 const USE_HTTPS = configData.USE_HTTPS || false;
 const SSL_KEY_PATH = configData.SSL_KEY_PATH;
