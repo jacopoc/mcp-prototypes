@@ -47,10 +47,15 @@ Each tool is defined and implemented in its own file. For example, the sample to
 Server configuration is managed via `config/config.json`, which defines:  
 
 - **`BACKEND_API_BASE`** — the base URL for backend REST API calls  
+- **`BACKEND_API_AUTH`** - the URL to get the OFBiz APIs access token
 - **`BACKEND_AUTH_TOKEN`** — the token used to authorize backend API calls  
 - **`SERVER_PORT`** — the port on which the MCP server listens for client connections (required only for the remote server)  
 
-The authorization token for the OFBiz API can be easily generated and set up by running the script `update_token.sh`. This script retrieves a JWT for an OOTB OFBiz demo instance (using `https://demo-stable.ofbiz.apache.org/rest/auth/token`).  
+The authorization token for the OFBiz API can be easily generated and set up by running the script: 
+
+`update_token.sh <user> <password>` 
+
+This script retrieves a JWT for an OOTB OFBiz instance (e.g., `https://demo-stable.ofbiz.apache.org/rest/auth/token`).  
 
 ---
 
