@@ -131,7 +131,7 @@ Add your local MCP server configuration:
   "mcpServers": {
     "Apache OFBiz": {
       "command": "npx",
-      "args": ["mcp-remote", "http://localhost:3000/mcp", "--allow-http"]
+      "args": ["-y", "mcp-remote", "http://localhost:3000/mcp", "--allow-http"]
     }
   }
 }
