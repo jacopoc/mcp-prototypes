@@ -2,6 +2,13 @@ import * as fs from "fs";
 import * as path from "path";
 import express from "express";
 import { randomUUID } from "node:crypto";
+import jwt, { JwtHeader, SigningKeyCallback } from "jsonwebtoken";
+import jwksClient from "jwks-rsa";
+import {
+  mcpAuthMetadataRouter,
+  getOAuthProtectedResourceMetadataUrl,
+} from "@modelcontextprotocol/sdk/server/auth/router.js";
+import { OAuthMetadata } from "@modelcontextprotocol/sdk/shared/auth.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js"
@@ -20,6 +27,8 @@ function getConfigData() {
     return JSON.parse(fs.readFileSync(configPath, "utf-8"));
 }
 
+const MCP_SERVER_BASE_URL = configData.MCP_SERVER_BASE_URL;
+const AUTHZ_SERVER_BASE_URL = configData.AUTHZ_SERVER_BASE_URL;
 export const BACKEND_API_BASE = configData.BACKEND_API_BASE;
 export const BACKEND_AUTH_TOKEN = () => getConfigData().BACKEND_AUTH_TOKEN;
 export const USER_AGENT = "OFBiz-MCP-server";
@@ -32,15 +41,189 @@ const SSL_KEY_PATH = configData.SSL_KEY_PATH;
 const SSL_CERT_PATH = configData.SSL_CERT_PATH;
 */
 
+// FIXME: Adjust based on your authorization server's metadata
+//const jwksUri = `${AUTHZ_SERVER_BASE_URL}/.well-known/jwks.json`;
+const jwksUri = `${AUTHZ_SERVER_BASE_URL}/protocol/openid-connect/certs`;
+
+// Create a JWKS client to retrieve the public key
+const client = jwksClient({
+  jwksUri,
+  cache: true,                 // enable local caching
+  cacheMaxEntries: 5,          // maximum number of keys stored
+  cacheMaxAge: 10 * 60 * 1000, // 10 minutes
+});
+
+// Function to get the public key from the JWT's kid
+function getKey(header: JwtHeader, callback: SigningKeyCallback) {
+  if (!header.kid) {
+    return callback(new Error("Missing 'kid' in token header"));
+  }
+  client.getSigningKey(header.kid, (err, key) => {
+    if (err) return callback(err, undefined);
+    const signingKey = key?.getPublicKey();
+    callback(null, signingKey);
+  });
+}
+
+function verifyToken(token: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    jwt.verify(
+      token,
+      getKey,
+      {
+        algorithms: ["RS256"], // adjust based on token's algorithm
+        //audience: "my-client-id",
+        issuer: AUTHZ_SERVER_BASE_URL,
+      },
+      (err, decoded) => {
+        if (err) return reject(err);
+        resolve(decoded);
+      }
+    );
+  });
+}
 
 const app = express();
 app.use(express.json());
+
+// MCP acting as an OAuth Resource Server
+
+// Add Protected Resource Metadata endpoint (RFC9728)
+function createOAuthUrls() {
+  return {
+    issuer: new URL(configData.AUTHZ_SERVER_BASE_URL).toString(),
+    introspection_endpoint: "",//new URL(configData.AUTHZ_SERVER_INTROSPECTION_URL).toString(),
+    authorization_endpoint: "",//new URL(configData.AUTHZ_SERVER_AUTHORIZATION_URL).toString(),
+    token_endpoint: "",//new URL(configData.AUTHZ_SERVER_TOKEN_URL).toString(),
+    registration_endpoint: ""
+  };
+}
+const oauthUrls = createOAuthUrls();
+
+const oauthMetadata: OAuthMetadata = {
+  ...oauthUrls,
+  response_types_supported: ["code"],
+};
+const mcpServerUrl = new URL(MCP_SERVER_BASE_URL);
+app.use(
+  mcpAuthMetadataRouter({
+    oauthMetadata,
+    resourceServerUrl: mcpServerUrl,
+    scopesSupported: ["mcp:tools"],
+    resourceName: "Apache OFBiz MCP Server",
+  }),
+);
+
+// Middleware to check for valid access token
+const authenticateRequest = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    // Return 401 with WWW-Authenticate header pointing to metadata
+    res.status(401)
+      .set('WWW-Authenticate', `Bearer realm="mcp", as_uri="${MCP_SERVER_BASE_URL}/.well-known/oauth-protected-resource"`)
+      .json({
+        jsonrpc: '2.0',
+        error: {
+          code: -32001,
+          message: 'Authorization required'
+        },
+        id: null
+      });
+    return;
+  }
+  
+  const token = authHeader.substring(7);
+  
+  try {
+    // Validate the access token
+    const validationResult = await validateAccessToken(token);
+    
+    if (!validationResult.valid) {
+      res.status(401)
+        .set('WWW-Authenticate', `Bearer realm="mcp", error="invalid_token", as_uri="${MCP_SERVER_BASE_URL}/.well-known/oauth-protected-resource"`)
+        .json({
+          jsonrpc: '2.0',
+          error: {
+            code: -32001,
+            message: 'Invalid or expired token'
+          },
+          id: null
+        });
+      return;
+    }
+    
+    // Attach user/token info to request for use in handlers
+    (req as any).auth = validationResult;
+    next();
+  } catch (error) {
+    res.status(500).json({
+      jsonrpc: '2.0',
+      error: {
+        code: -32603,
+        message: 'Internal server error during authentication'
+      },
+      id: null
+    });
+  }
+};
+
+async function validateAccessToken(token: string): Promise<{
+  valid: boolean;
+  clientId?: string;
+  scopes?: string[];
+  userId?: string;
+  audience?: string;
+}> {
+  try {
+    // Using JWT tokens, validate locally
+    const result = await verifyToken(token) as any;
+
+    // Ensure the audience matches the MCP server's canonical URI
+    if (result.aud !== `${MCP_SERVER_BASE_URL}/mcp`) {
+      // FIXME
+      //return { valid: false };
+    }
+    
+    /*
+    // Option 2: Call your authorization server's introspection endpoint
+    const response = await fetch(`${AUTHZ_SERVER_BASE_URL}/oauth2/introspect`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        token: token,
+        token_type_hint: 'access_token'
+      })
+    });
+
+    const result = await response.json();
+    
+    if (!result.active) {
+      return { valid: false };
+    }
+    */
+    
+    return {
+      valid: true,
+      clientId: result.client_id,
+      scopes: result.scope?.split(' '),
+      userId: result.sub,
+      audience: result.aud
+    };
+  } catch (error) {
+    console.error('Token validation error:', error);
+    return { valid: false };
+  }
+}
+
 
 // Map to store transports by session ID
 const transports: { [sessionId: string]: StreamableHTTPServerTransport } = {};
 
 // Handle POST requests for client-to-server communication
-app.post('/mcp', async (req, res) => {
+app.post('/mcp', authenticateRequest, async (req, res) => {
   // Check for existing session ID
   const sessionId = req.headers['mcp-session-id'] as string | undefined;
   let transport: StreamableHTTPServerTransport;

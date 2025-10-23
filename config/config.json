@@ -1,4 +1,9 @@
 {
+  "MCP_SERVER_BASE_URL": "http://localhost:3000",
+  "AUTHZ_SERVER_BASE_URL": "http://localhost:8080/realms/OFBiz",
+  "AUTHZ_SERVER_INTROSPECTION_URL": "http://localhost:8080/realms/OFBiz/protocol/openid-connect/token/introspect",
+  "AUTHZ_SERVER_AUTHORIZATION_URL": "http://localhost:8080/realms/OFBiz/protocol/openid-connect/auth",
+  "AUTHZ_SERVER_TOKEN_URL": "http://localhost:8080/realms/OFBiz/protocol/openid-connect/token",
   "BACKEND_API_BASE": "https://demo-stable.ofbiz.apache.org/rest/services",
   "BACKEND_API_AUTH": "https://demo-stable.ofbiz.apache.org/rest/auth/token",
   "BACKEND_AUTH_TOKEN": "",
