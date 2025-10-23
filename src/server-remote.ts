@@ -92,9 +92,9 @@ app.use(express.json());
 function createOAuthUrls() {
   return {
     issuer: new URL(configData.AUTHZ_SERVER_BASE_URL).toString(),
-    introspection_endpoint: "",//new URL(configData.AUTHZ_SERVER_INTROSPECTION_URL).toString(),
-    authorization_endpoint: "",//new URL(configData.AUTHZ_SERVER_AUTHORIZATION_URL).toString(),
-    token_endpoint: "",//new URL(configData.AUTHZ_SERVER_TOKEN_URL).toString(),
+    introspection_endpoint: "",
+    authorization_endpoint: "",
+    token_endpoint: "",
     registration_endpoint: ""
   };
 }
@@ -117,11 +117,12 @@ app.use(
 // Middleware to check for valid access token
 const authenticateRequest = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const authHeader = req.headers.authorization;
+  const resourceMetadataUrl = getOAuthProtectedResourceMetadataUrl(mcpServerUrl);
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     // Return 401 with WWW-Authenticate header pointing to metadata
     res.status(401)
-      .set('WWW-Authenticate', `Bearer realm="mcp", as_uri="${MCP_SERVER_BASE_URL}/.well-known/oauth-protected-resource"`)
+      .set('WWW-Authenticate', `Bearer realm="mcp", as_uri="${resourceMetadataUrl}"`)
       .json({
         jsonrpc: '2.0',
         error: {
@@ -141,7 +142,7 @@ const authenticateRequest = async (req: express.Request, res: express.Response, 
     
     if (!validationResult.valid) {
       res.status(401)
-        .set('WWW-Authenticate', `Bearer realm="mcp", error="invalid_token", as_uri="${MCP_SERVER_BASE_URL}/.well-known/oauth-protected-resource"`)
+        .set('WWW-Authenticate', `Bearer realm="mcp", error="invalid_token", as_uri="${resourceMetadataUrl}"`)
         .json({
           jsonrpc: '2.0',
           error: {
@@ -180,7 +181,7 @@ async function validateAccessToken(token: string): Promise<{
     const result = await verifyToken(token) as any;
 
     // Ensure the audience matches the MCP server's canonical URI
-    if (result.aud !== `${MCP_SERVER_BASE_URL}/mcp`) {
+    if (result.aud !== MCP_SERVER_BASE_URL) {
       // FIXME
       //return { valid: false };
     }
