@@ -95,7 +95,7 @@ function createOAuthUrls() {
     introspection_endpoint: "",
     authorization_endpoint: "",
     token_endpoint: "",
-    registration_endpoint: ""
+    registration_endpoint: "" // optional
   };
 }
 const oauthUrls = createOAuthUrls();
@@ -110,7 +110,7 @@ app.use(
     oauthMetadata,
     resourceServerUrl: mcpServerUrl,
     scopesSupported: ["mcp:tools"],
-    resourceName: "Apache OFBiz MCP Server",
+    resourceName: "Apache OFBiz MCP Server", // optional
   }),
 );
 
