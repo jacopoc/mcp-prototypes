@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import express from "express";
+import cors from "cors";
 import { randomUUID } from "node:crypto";
 import jwt, { JwtHeader, SigningKeyCallback } from "jsonwebtoken";
 import jwksClient from "jwks-rsa";
@@ -41,13 +42,11 @@ const SSL_KEY_PATH = configData.SSL_KEY_PATH;
 const SSL_CERT_PATH = configData.SSL_CERT_PATH;
 */
 
-// FIXME: Adjust based on your authorization server's metadata
-//const jwksUri = `${AUTHZ_SERVER_BASE_URL}/.well-known/jwks.json`;
-const jwksUri = `${AUTHZ_SERVER_BASE_URL}/protocol/openid-connect/certs`;
+const enableAuth = (MCP_SERVER_BASE_URL && AUTHZ_SERVER_BASE_URL);
 
 // Create a JWKS client to retrieve the public key
 const client = jwksClient({
-  jwksUri,
+  jwksUri: `${AUTHZ_SERVER_BASE_URL}/protocol/openid-connect/certs`, // FIXME: Adjust based on your authorization server's metadata
   cache: true,                 // enable local caching
   cacheMaxEntries: 5,          // maximum number of keys stored
   cacheMaxAge: 10 * 60 * 1000, // 10 minutes
@@ -83,41 +82,9 @@ function verifyToken(token: string): Promise<any> {
   });
 }
 
-const app = express();
-app.use(express.json());
-
-// MCP acting as an OAuth Resource Server
-
-// Add Protected Resource Metadata endpoint (RFC9728)
-function createOAuthUrls() {
-  return {
-    issuer: new URL(configData.AUTHZ_SERVER_BASE_URL).toString(),
-    introspection_endpoint: "",
-    authorization_endpoint: "",
-    token_endpoint: "",
-    registration_endpoint: "" // optional
-  };
-}
-const oauthUrls = createOAuthUrls();
-
-const oauthMetadata: OAuthMetadata = {
-  ...oauthUrls,
-  response_types_supported: ["code"],
-};
-const mcpServerUrl = new URL(MCP_SERVER_BASE_URL);
-app.use(
-  mcpAuthMetadataRouter({
-    oauthMetadata,
-    resourceServerUrl: mcpServerUrl,
-    scopesSupported: ["mcp:tools"],
-    resourceName: "Apache OFBiz MCP Server", // optional
-  }),
-);
-
 // Middleware to check for valid access token
 const authenticateRequest = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const authHeader = req.headers.authorization;
-  const resourceMetadataUrl = getOAuthProtectedResourceMetadataUrl(mcpServerUrl);
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     // Return 401 with WWW-Authenticate header pointing to metadata
@@ -219,12 +186,7 @@ async function validateAccessToken(token: string): Promise<{
   }
 }
 
-
-// Map to store transports by session ID
-const transports: { [sessionId: string]: StreamableHTTPServerTransport } = {};
-
-// Handle POST requests for client-to-server communication
-app.post('/mcp', authenticateRequest, async (req, res) => {
+const handleMcpRequest = async (req: express.Request, res: express.Response) => {
   // Check for existing session ID
   const sessionId = req.headers['mcp-session-id'] as string | undefined;
   let transport: StreamableHTTPServerTransport;
@@ -240,6 +202,7 @@ app.post('/mcp', authenticateRequest, async (req, res) => {
         // Store the transport by session ID
         transports[sessionId] = transport;
       },
+      // FIXME:
       // DNS rebinding protection is disabled by default for backwards compatibility. If you are running this server
       // locally, make sure to set:
       // enableDnsRebindingProtection: true,
@@ -298,7 +261,7 @@ app.post('/mcp', authenticateRequest, async (req, res) => {
   console.log(`Processing request for session ${sessionId}`);
   await transport.handleRequest(req, res, req.body);
   console.log(`Completed request for session ${sessionId}`);
-});
+};
 
 // Reusable handler for GET and DELETE requests
 const handleSessionRequest = async (req: express.Request, res: express.Response) => {
@@ -312,6 +275,48 @@ const handleSessionRequest = async (req: express.Request, res: express.Response)
   await transport.handleRequest(req, res);
 };
 
+// Map to store transports by session ID
+const transports: { [sessionId: string]: StreamableHTTPServerTransport } = {};
+// Precompute resource metadata URL
+const resourceMetadataUrl = (enableAuth ? getOAuthProtectedResourceMetadataUrl(new URL(MCP_SERVER_BASE_URL)) : "");
+
+// ======================================================================
+// Initialization of Express app
+// ======================================================================
+
+const app = express();
+app.use(express.json());
+// Allow CORS all domains, expose the Mcp-Session-Id header
+app.use(
+    cors({
+        origin: '*', // Allow all origins
+        exposedHeaders: ['Mcp-Session-Id']
+    })
+);
+
+if (enableAuth) {
+  // Handle OAuth Protected Resource Metadata endpoint (RFC9728)
+  app.use(
+    mcpAuthMetadataRouter({
+      oauthMetadata: {
+        issuer: new URL(AUTHZ_SERVER_BASE_URL).toString(),
+        introspection_endpoint: "",
+        authorization_endpoint: "",
+        token_endpoint: "",
+        registration_endpoint: "", // optional
+        response_types_supported: ["code"]
+      },
+      resourceServerUrl: new URL(MCP_SERVER_BASE_URL),
+      scopesSupported: ["mcp:tools"],
+      resourceName: "Apache OFBiz MCP Server", // optional
+    }),
+  );
+  // Handle POST requests for authenticated client-to-server communication
+  app.post('/mcp', authenticateRequest, handleMcpRequest);
+} else {
+  // Handle POST requests for unauthenticated client-to-server communication
+  app.post('/mcp', handleMcpRequest);
+}
 // Handle GET requests for server-to-client notifications via SSE
 app.get('/mcp', handleSessionRequest);
 
@@ -319,5 +324,5 @@ app.get('/mcp', handleSessionRequest);
 app.delete('/mcp', handleSessionRequest);
 
 app.listen(SERVER_PORT, () => {
-    console.log(`MCP stateful Streamable HTTP Server listening on port ${SERVER_PORT}`);
+    console.log(`MCP stateful Streamable HTTP Server listening on port ${SERVER_PORT} with ${enableAuth ? 'authentication' : 'no authentication'}.`);
 });
