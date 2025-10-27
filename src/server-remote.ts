@@ -58,7 +58,6 @@ async function getJwksUri(issuer: string): Promise<string> {
 }
 // Create a JWKS client to retrieve the public key
 const client = !enableAuth ? null : jwksClient({
-  //jwksUri: `${AUTHZ_SERVER_BASE_URL}/protocol/openid-connect/certs`, // FIXME: Adjust based on authorization server's metadata
   jwksUri: await getJwksUri(AUTHZ_SERVER_BASE_URL),
   cache: true,                 // enable local caching
   cacheMaxEntries: 5,          // maximum number of keys stored
