@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import fetch from "node-fetch";
 import express from "express";
 import cors from "cors";
 import { randomUUID } from "node:crypto";
@@ -44,9 +45,21 @@ const SSL_CERT_PATH = configData.SSL_CERT_PATH;
 
 const enableAuth = (MCP_SERVER_BASE_URL && AUTHZ_SERVER_BASE_URL);
 
+// Function to fetch JWKS URI from OpenID Connect metadata
+async function getJwksUri(issuer: string): Promise<string> {
+  const res = await fetch(`${issuer}/.well-known/openid-configuration`);
+  if (!res.ok) throw new Error(`Failed to fetch metadata: ${res.statusText}`);
+  const metadata = await res.json() as Record<string, unknown>;
+  const jwks = metadata["jwks_uri"];
+  if (typeof jwks !== "string") {
+    throw new Error("Invalid OpenID metadata: 'jwks_uri' missing or not a string");
+  }
+  return jwks;
+}
 // Create a JWKS client to retrieve the public key
-const client = jwksClient({
-  jwksUri: `${AUTHZ_SERVER_BASE_URL}/protocol/openid-connect/certs`, // FIXME: Adjust based on your authorization server's metadata
+const client = !enableAuth ? null : jwksClient({
+  //jwksUri: `${AUTHZ_SERVER_BASE_URL}/protocol/openid-connect/certs`, // FIXME: Adjust based on authorization server's metadata
+  jwksUri: await getJwksUri(AUTHZ_SERVER_BASE_URL),
   cache: true,                 // enable local caching
   cacheMaxEntries: 5,          // maximum number of keys stored
   cacheMaxAge: 10 * 60 * 1000, // 10 minutes
@@ -54,6 +67,9 @@ const client = jwksClient({
 
 // Function to get the public key from the JWT's kid
 function getKey(header: JwtHeader, callback: SigningKeyCallback) {
+  if (!client) {
+    return callback(new Error("JWKS client not initialized"));
+  }
   if (!header.kid) {
     return callback(new Error("Missing 'kid' in token header"));
   }
@@ -70,8 +86,8 @@ function verifyToken(token: string): Promise<any> {
       token,
       getKey,
       {
-        algorithms: ["RS256"], // adjust based on token's algorithm
-        //audience: "my-client-id",
+        algorithms: ["RS256"], // FIXME: adjust based on token's algorithm
+        //audience: "my-client-id", // FIXME
         issuer: AUTHZ_SERVER_BASE_URL,
       },
       (err, decoded) => {
