@@ -168,26 +168,6 @@ async function validateAccessToken(token: string): Promise<{
       //return { valid: false };
     }
     
-    /*
-    // Option 2: Call your authorization server's introspection endpoint
-    const response = await fetch(`${AUTHZ_SERVER_BASE_URL}/oauth2/introspect`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        token: token,
-        token_type_hint: 'access_token'
-      })
-    });
-
-    const result = await response.json();
-    
-    if (!result.active) {
-      return { valid: false };
-    }
-    */
-    
     return {
       valid: true,
       clientId: result.client_id,
