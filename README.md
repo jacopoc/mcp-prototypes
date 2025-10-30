@@ -106,6 +106,7 @@ Add your local MCP server configuration:
 ```
 After updating the configuration file, launch Claude Desktop and try the following sample prompts:
 * *"Can you provide some information about the product WG-1111?"*
+* *"Create a SEO friendly description for the product with ID GZ-1000"*
 * *"Can you provide some information about a product?"*  
 (Claude will ask for a product ID before invoking the tool.)
 * *"Can you compare two products?"*  
