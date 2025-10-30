@@ -5,9 +5,9 @@ This project provides a prototype implementation of an MCP server that:
 - exposes specific tools,  
 - receives requests from an MCP client (usually hosted in a generative AI application such as Claude Desktop),  
 - forwards those requests to a remote backend via RESTful API endpoints,
-- is implemented using the Anthropic SDK for TypeScript.    
+- implements authorization according to the MCP specifications (OAuth Authorization Code Flow with support for Metadata discovery, Dynamic Client Registration etc...).
 
-The server enables generative AI applications to interact with remote systems that expose REST API endpoints, such as **Apache OFBiz** and **Moqui**.  
+The server enables generative AI applications to interact with backend systems that expose REST API endpoints, such as **Apache OFBiz** and **Moqui**.  
 
 The server is implemented in two versions, one that runs as a local MCP server (stdio transport) and one that runs as a remote MCP server (Streamable HTTP transport).
 
