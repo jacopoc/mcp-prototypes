@@ -1,6 +1,6 @@
 {
-  "MCP_SERVER_BASE_URL": "http://localhost:3000/mcp",
-  "AUTHZ_SERVER_BASE_URL": "http://localhost:8080/realms/OFBiz",
+  "MCP_SERVER_BASE_URL": "",
+  "AUTHZ_SERVER_BASE_URL": "",
   "BACKEND_API_BASE": "https://demo-stable.ofbiz.apache.org/rest/services",
   "BACKEND_API_AUTH": "https://demo-stable.ofbiz.apache.org/rest/auth/token",
   "BACKEND_AUTH_TOKEN": "",
