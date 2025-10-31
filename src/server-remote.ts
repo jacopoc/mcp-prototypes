@@ -31,6 +31,7 @@ function getConfigData() {
 
 const MCP_SERVER_BASE_URL = configData.MCP_SERVER_BASE_URL;
 const AUTHZ_SERVER_BASE_URL = configData.AUTHZ_SERVER_BASE_URL;
+const SCOPES_SUPPORTED = configData.SCOPES_SUPPORTED;
 export const BACKEND_API_BASE = configData.BACKEND_API_BASE;
 export const BACKEND_AUTH_TOKEN = () => getConfigData().BACKEND_AUTH_TOKEN;
 export const USER_AGENT = "OFBiz-MCP-server";
@@ -302,7 +303,7 @@ if (enableAuth) {
         response_types_supported: ["code"]
       },
       resourceServerUrl: new URL(MCP_SERVER_BASE_URL),
-      scopesSupported: ["mcp:tools"],
+      scopesSupported: SCOPES_SUPPORTED,
       resourceName: "Apache OFBiz MCP Server", // optional
     }),
   );
