@@ -1,6 +1,6 @@
 # MCP Server for Apache OFBiz®
 
-This project provides an implementation of a Model Context Protocol (MCP) server that runs custom tools to invoke remote services thorugh API endpoints,  based on requests from an MCP client (usually hosted in a generative AI application such as Claude Desktop).
+This project provides an implementation of a Model Context Protocol (MCP) server that runs custom tools to invoke remote services through API endpoints,  based on requests from an MCP client (usually hosted in a generative AI application such as Claude Desktop).
 
 The project is implemented with the **Anthropic TypeScript SDK**, and requires **Node.js** as runtime environment.
 
